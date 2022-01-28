@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemies
+  - Enemy0
+  - Enemy1
+  - EnemyBullet
+  - PlayerBullet
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Player
+  - Enemy
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1333346307
+    locked: 0
+  - name: Enemy Projectile
+    uniqueID: 3549476029
+    locked: 0
+  - name: Enemies
+    uniqueID: 3896806777
+    locked: 0
+  - name: Player Projectile
+    uniqueID: 1050422163
+    locked: 0
+  - name: Player
+    uniqueID: 1068376713
+    locked: 0
+  - name: Particle Effects
+    uniqueID: 1133627845
+    locked: 0
