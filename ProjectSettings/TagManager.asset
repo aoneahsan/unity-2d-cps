@@ -11,12 +11,12 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - MidGround
+  - FarGround
+  - ForeGround
+  - WaterFall
+  - PickablesItems
   - 
   - 
   - 
@@ -40,4 +40,22 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: FarGround
+    uniqueID: 1606565631
+    locked: 0
+  - name: MidGround
+    uniqueID: 4229113507
+    locked: 0
+  - name: Ground
+    uniqueID: 2320263659
+    locked: 0
+  - name: ForeGround
+    uniqueID: 4014114917
+    locked: 0
+  - name: WaterFall
+    uniqueID: 326693163
+    locked: 0
+  - name: PickablesItems
+    uniqueID: 2602060993
     locked: 0
