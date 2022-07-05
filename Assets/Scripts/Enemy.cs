@@ -8,6 +8,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
   [SerializeField][Range(0, 10)] protected int hitDamage = 1;
   [SerializeField][Range(0, 10)] protected float speed = 1f;
   [SerializeField][Range(0, 10)] protected int rewardGems = 5;
+  [SerializeField][Range(1, 10)] protected int stopDistanceFromPlayer = 2;
 
   [SerializeField] protected Transform[] wavePoints;
   protected Transform startingPosition;
@@ -51,13 +52,12 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
   protected virtual void Update()
   {
-
     // if Idle animation is playing return
-    if (enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || isDead)
+    if (enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || isDead || (player != null && player.IsDead))
     {
       return;
     }
-    if (DistanceFromPlayer() < 1f)
+    if (DistanceFromPlayer() < stopDistanceFromPlayer)
     {
       FacePlayerAndAttack();
     }
@@ -69,13 +69,14 @@ public abstract class Enemy : MonoBehaviour, IDamageable
 
   protected void Move()
   {
-    if (enemyAnimator.GetBool("Attack"))
+    if (!enemyAnimator.GetBool("Walk"))
     {
-      enemyAnimator.SetBool("Attack", false);
+      StartMoveAnimation();
     }
+
     if (transform.position == endingPosition.position)
     {
-      StartIdleAnimation();
+      PlayIdleAnimation();
       FlipMossGiantSprite(true);
       currentTarget = startingPosition.position;
     }
@@ -87,10 +88,19 @@ public abstract class Enemy : MonoBehaviour, IDamageable
       }
       else
       {
-        StartIdleAnimation();
+        PlayIdleAnimation();
       }
       FlipMossGiantSprite(false);
       currentTarget = endingPosition.position;
+    }
+
+    if (currentTarget == startingPosition.position)
+    {
+      FlipMossGiantSprite(true);
+    }
+    else if (currentTarget == endingPosition.position)
+    {
+      FlipMossGiantSprite(false);
     }
 
     transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
@@ -101,19 +111,6 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     if (enemySpriteRenderer != null && enemySpriteRenderer.flipX != state)
     {
       enemySpriteRenderer.flipX = state;
-    }
-  }
-
-  void StartIdleAnimation()
-  {
-    PlayAnimation("Idle");
-  }
-
-  void PlayAnimation(string anim)
-  {
-    if (enemyAnimator != null)
-    {
-      enemyAnimator.SetTrigger(anim);
     }
   }
 
@@ -147,7 +144,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
     else
     {
-      PlayAnimation("Hit");
+      SetAttackAnimation(true);
     }
   }
 
@@ -159,7 +156,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
       GetComponent<BoxCollider2D>().enabled = false;
       if (enemyAnimator != null)
       {
-        enemyAnimator.SetTrigger("Dead");
+        PlayDeadAnimation();
       }
       Destroy(gameObject, 3);
     }
@@ -183,6 +180,63 @@ public abstract class Enemy : MonoBehaviour, IDamageable
       enemySpriteRenderer.flipX = true;
     }
 
-    enemyAnimator.SetBool("Attack", true);
+    StartAttackAnimation();
+  }
+
+  void StartMoveAnimation()
+  {
+    // start moving anim and stop attacking anim
+    SetWalkAnimation(true);
+    SetAttackAnimation(false);
+  }
+
+  void StartAttackAnimation()
+  {
+    // stop moving anim and start attacking anim
+    SetWalkAnimation(false);
+    SetAttackAnimation(true);
+  }
+
+  void SetWalkAnimation(bool walkAnimationState)
+  {
+    if (enemyAnimator != null)
+    {
+      enemyAnimator.SetBool("Walk", walkAnimationState);
+    }
+  }
+
+  void SetAttackAnimation(bool attackAnimationState)
+  {
+    if (enemyAnimator != null)
+    {
+      enemyAnimator.SetBool("Attack", attackAnimationState);
+    }
+  }
+
+  void PlayIdleAnimation()
+  {
+    if (enemyAnimator != null)
+    {
+
+      enemyAnimator.SetTrigger("Idle");
+    }
+  }
+
+  void PlayHitAnimation()
+  {
+    if (enemyAnimator != null)
+    {
+      enemyAnimator.SetTrigger("Hit");
+    }
+  }
+
+  void PlayDeadAnimation()
+  {
+    if (enemyAnimator != null)
+    {
+      SetWalkAnimation(false);
+      SetAttackAnimation(false);
+      enemyAnimator.SetTrigger("Dead");
+    }
   }
 }

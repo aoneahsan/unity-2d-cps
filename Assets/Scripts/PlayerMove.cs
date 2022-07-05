@@ -10,24 +10,19 @@ public class PlayerMove : MonoBehaviour
   [Tooltip("Add jumpheigh we will use this to determine how high user will jump.")]
   [SerializeField] int jumpHeight = 4;
 
+  Player player;
   PlayerAnimator playerAnimator;
   Rigidbody2D rb2D;
   SpriteRenderer playerSpriteRenderer;
 
   bool grounded = false;
 
-  void Start()
+  private void Awake()
   {
-    rb2D = GetComponent<Rigidbody2D>();
+    player = GetComponent<Player>();
     playerAnimator = GetComponent<PlayerAnimator>();
+    rb2D = GetComponent<Rigidbody2D>();
     playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
-  }
-
-  private void Update()
-  {
-    RaycastHit2D hitToGround = Physics2D.Raycast(transform.position, Vector2.down);
-    Debug.DrawRay(transform.position, Vector2.down, Color.red);
-
   }
 
   void OnCollisionEnter2D(Collision2D other)
@@ -49,6 +44,11 @@ public class PlayerMove : MonoBehaviour
 
   void OnMove(InputValue input)
   {
+    if (player != null && player.IsDead)
+    {
+      return;
+    }
+
     Vector2 movementInput = input.Get<Vector2>();
     rb2D.velocity = new Vector2(movementInput.x * moveSpeed, rb2D.velocity.y);
     playerAnimator.SetRunAnimation(Mathf.Abs(movementInput.x));
@@ -66,6 +66,11 @@ public class PlayerMove : MonoBehaviour
 
   void OnJump(InputValue input)
   {
+    if (player != null && player.IsDead)
+    {
+      return;
+    }
+
     bool jumpCondition = input.isPressed && grounded;
     if (jumpCondition)
     {
@@ -76,11 +81,14 @@ public class PlayerMove : MonoBehaviour
 
   void OnFire(InputValue input)
   {
+    if (player != null && player.IsDead)
+    {
+      return;
+    }
+
     if (input.isPressed && grounded)
     {
       playerAnimator.StartAttackAnimation();
     }
   }
-
-
 }

@@ -22,7 +22,7 @@ public class PlayerAnimator : MonoBehaviour
 
   public void StartDeadAnimation()
   {
-    playerSpriteAnimator.SetBool("IsDead", true);
+    playerSpriteAnimator.SetTrigger("Dead");
   }
 
   public void StartAttackAnimation()

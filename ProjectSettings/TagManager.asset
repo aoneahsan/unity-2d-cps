@@ -14,10 +14,10 @@ TagManager:
   - UI
   - Ground
   - Pickables
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - PlayerWeapon
+  - Enemy
+  - EnemyWeapon
   - 
   - 
   - 
