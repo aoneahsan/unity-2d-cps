@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour
+public abstract class Enemy : MonoBehaviour, IDamageable
 {
-  [SerializeField][Range(0, 10)] protected float health;
-  [SerializeField][Range(0, 10)] protected float hitDamage;
-  [SerializeField][Range(0, 10)] protected float speed;
-  [SerializeField][Range(0, 10)] protected float rewardGems;
+  [SerializeField][Range(0, 10)] protected int health = 3;
+  [SerializeField][Range(0, 10)] protected int hitDamage = 1;
+  [SerializeField][Range(0, 10)] protected float speed = 1f;
+  [SerializeField][Range(0, 10)] protected int rewardGems = 5;
 
   [SerializeField] protected Transform[] wavePoints;
   protected Transform startingPosition;
@@ -16,8 +16,15 @@ public abstract class Enemy : MonoBehaviour
   Animator enemyAnimator;
 
   Vector3 currentTarget;
+  Player player;
 
   bool isStartingRound = true;
+  bool isDead = false;
+
+  private void Awake()
+  {
+    player = FindObjectOfType<Player>();
+  }
 
   protected virtual void Start()
   {
@@ -46,15 +53,26 @@ public abstract class Enemy : MonoBehaviour
   {
 
     // if Idle animation is playing return
-    if (enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+    if (enemyAnimator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || isDead)
     {
       return;
     }
-    Move();
+    if (DistanceFromPlayer() < 1f)
+    {
+      FacePlayerAndAttack();
+    }
+    else
+    {
+      Move();
+    }
   }
 
   protected void Move()
   {
+    if (enemyAnimator.GetBool("Attack"))
+    {
+      enemyAnimator.SetBool("Attack", false);
+    }
     if (transform.position == endingPosition.position)
     {
       StartIdleAnimation();
@@ -88,9 +106,14 @@ public abstract class Enemy : MonoBehaviour
 
   void StartIdleAnimation()
   {
+    PlayAnimation("Idle");
+  }
+
+  void PlayAnimation(string anim)
+  {
     if (enemyAnimator != null)
     {
-      enemyAnimator.SetTrigger("Idle");
+      enemyAnimator.SetTrigger(anim);
     }
   }
 
@@ -112,5 +135,54 @@ public abstract class Enemy : MonoBehaviour
       return null;
     }
     return wavePoints[wavePoints.Length - 1];
+  }
+
+  public void Damage(int damage)
+  {
+    health -= damage;
+
+    if (health <= 0)
+    {
+      Die();
+    }
+    else
+    {
+      PlayAnimation("Hit");
+    }
+  }
+
+  public void Die()
+  {
+    if (health <= 0)
+    {
+      isDead = true;
+      GetComponent<BoxCollider2D>().enabled = false;
+      if (enemyAnimator != null)
+      {
+        enemyAnimator.SetTrigger("Dead");
+      }
+      Destroy(gameObject, 3);
+    }
+  }
+
+  float DistanceFromPlayer()
+  {
+    return Vector3.Distance(transform.position, player.transform.position);
+  }
+
+  void FacePlayerAndAttack()
+  {
+    float distance = player.transform.position.x - transform.position.x;
+
+    if (distance > 0)
+    {
+      enemySpriteRenderer.flipX = false;
+    }
+    else
+    {
+      enemySpriteRenderer.flipX = true;
+    }
+
+    enemyAnimator.SetBool("Attack", true);
   }
 }
