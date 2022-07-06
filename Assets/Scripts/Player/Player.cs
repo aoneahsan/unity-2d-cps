@@ -8,7 +8,7 @@ public class Player : MonoBehaviour, IDamageable
 {
   [SerializeField][Range(0, 100)] int health = 10;
   [SerializeField] int diamonds = 0;
-
+  public int Diamonds { get { return diamonds; } }
   PlayerAnimator playerAnimator;
   Rigidbody2D playerRigidbody;
   PlayerInput playerInput;

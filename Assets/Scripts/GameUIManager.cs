@@ -1,10 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameUIManager : MonoBehaviour
 {
   [SerializeField] GameObject shopUI;
+  [SerializeField] TextMeshProUGUI playerDiamondsBalanceText;
+
+  GameManager gameManager;
+
+  private void Awake()
+  {
+    CloseShop();
+  }
+
+  private void Start()
+  {
+    gameManager = GetComponent<GameManager>();
+  }
 
   public bool IsShopOpen()
   {
@@ -20,8 +34,9 @@ public class GameUIManager : MonoBehaviour
 
   public void OpenShop()
   {
-    if (shopUI != null)
+    if (shopUI != null && gameManager != null && gameManager.Player != null && playerDiamondsBalanceText != null)
     {
+      playerDiamondsBalanceText.text = $"{gameManager.Player.Diamonds}G";
       shopUI.SetActive(true);
     }
   }

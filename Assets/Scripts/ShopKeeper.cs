@@ -13,10 +13,19 @@ public class ShopKeeper : MonoBehaviour
 
   private void OnCollisionEnter2D(Collision2D other)
   {
-    if (other.gameObject.tag == "Player" && gameManager != null && !gameManager.GameUIManager.IsShopOpen())
+    if (other.gameObject.tag == "Player" && gameManager != null)
     {
       Debug.Log("player entered shop");
       gameManager.GameUIManager.OpenShop();
+    }
+  }
+
+  private void OnCollisionExit2D(Collision2D other)
+  {
+    if (other.gameObject.tag == "Player" && gameManager != null)
+    {
+      Debug.Log("player exited shop");
+      gameManager.GameUIManager.CloseShop();
     }
   }
 }
