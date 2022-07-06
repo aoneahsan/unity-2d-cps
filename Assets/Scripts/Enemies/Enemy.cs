@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,18 +10,22 @@ public abstract class Enemy : MonoBehaviour, IDamageable
   [SerializeField][Range(0, 10)] protected float speed = 1f;
   [SerializeField][Range(0, 10)] protected int rewardGems = 5;
   [SerializeField][Range(1, 10)] protected int stopDistanceFromPlayer = 2;
+  [SerializeField] protected int dropDiamondsOnDeath = 1;
+  [SerializeField] protected GameObject diamondPrefab;
 
   [SerializeField] protected Transform[] wavePoints;
   protected Transform startingPosition;
   protected Transform endingPosition;
-  SpriteRenderer enemySpriteRenderer;
-  Animator enemyAnimator;
+  protected SpriteRenderer enemySpriteRenderer;
+  protected Animator enemyAnimator;
 
-  Vector3 currentTarget;
-  Player player;
+  protected Vector3 currentTarget;
+  protected Player player;
 
-  bool isStartingRound = true;
-  bool isDead = false;
+
+  protected bool isStartingRound = true;
+  protected bool isDead = false;
+  public bool IsDead { get { return isDead; } }
 
   private void Awake()
   {
@@ -67,7 +72,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  protected void Move()
+  protected virtual void Move()
   {
     if (!enemyAnimator.GetBool("Walk"))
     {
@@ -106,7 +111,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     transform.position = Vector3.MoveTowards(transform.position, currentTarget, speed * Time.deltaTime);
   }
 
-  void FlipMossGiantSprite(bool state)
+  protected virtual void FlipMossGiantSprite(bool state)
   {
     if (enemySpriteRenderer != null && enemySpriteRenderer.flipX != state)
     {
@@ -114,7 +119,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  protected Transform GetStartPosition()
+  protected virtual Transform GetStartPosition()
   {
     if (wavePoints.Length == 0)
     {
@@ -124,7 +129,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     return wavePoints[0];
   }
 
-  protected Transform GetEndPosition()
+  protected virtual Transform GetEndPosition()
   {
     if (wavePoints.Length == 0)
     {
@@ -134,7 +139,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     return wavePoints[wavePoints.Length - 1];
   }
 
-  public void Damage(int damage)
+  public virtual void Damage(int damage)
   {
     health -= damage;
 
@@ -148,7 +153,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  public void Die()
+  public virtual void Die()
   {
     if (health <= 0)
     {
@@ -158,16 +163,29 @@ public abstract class Enemy : MonoBehaviour, IDamageable
       {
         PlayDeadAnimation();
       }
+      if (dropDiamondsOnDeath > 0 && diamondPrefab != null)
+      {
+        DropDiamonds();
+      }
       Destroy(gameObject, 3);
     }
   }
 
-  float DistanceFromPlayer()
+  private void DropDiamonds()
+  {
+    if (dropDiamondsOnDeath > 0 && diamondPrefab != null)
+    {
+      GameObject diamondObj = Instantiate(diamondPrefab, transform.position, Quaternion.identity);
+      diamondObj.GetComponent<DiamondPickable>().SetAmount(dropDiamondsOnDeath);
+    }
+  }
+
+  protected virtual float DistanceFromPlayer()
   {
     return Vector3.Distance(transform.position, player.transform.position);
   }
 
-  void FacePlayerAndAttack()
+  protected virtual void FacePlayerAndAttack()
   {
     float distance = player.transform.position.x - transform.position.x;
 
@@ -183,21 +201,21 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     StartAttackAnimation();
   }
 
-  void StartMoveAnimation()
+  protected virtual void StartMoveAnimation()
   {
     // start moving anim and stop attacking anim
     SetWalkAnimation(true);
     SetAttackAnimation(false);
   }
 
-  void StartAttackAnimation()
+  protected virtual void StartAttackAnimation()
   {
     // stop moving anim and start attacking anim
     SetWalkAnimation(false);
     SetAttackAnimation(true);
   }
 
-  void SetWalkAnimation(bool walkAnimationState)
+  protected virtual void SetWalkAnimation(bool walkAnimationState)
   {
     if (enemyAnimator != null)
     {
@@ -205,7 +223,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  void SetAttackAnimation(bool attackAnimationState)
+  protected virtual void SetAttackAnimation(bool attackAnimationState)
   {
     if (enemyAnimator != null)
     {
@@ -213,7 +231,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  void PlayIdleAnimation()
+  protected virtual void PlayIdleAnimation()
   {
     if (enemyAnimator != null)
     {
@@ -222,7 +240,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  void PlayHitAnimation()
+  protected virtual void PlayHitAnimation()
   {
     if (enemyAnimator != null)
     {
@@ -230,7 +248,7 @@ public abstract class Enemy : MonoBehaviour, IDamageable
     }
   }
 
-  void PlayDeadAnimation()
+  protected virtual void PlayDeadAnimation()
   {
     if (enemyAnimator != null)
     {

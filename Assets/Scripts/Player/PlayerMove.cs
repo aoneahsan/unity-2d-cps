@@ -44,7 +44,8 @@ public class PlayerMove : MonoBehaviour
 
   void OnMove(InputValue input)
   {
-    if (player != null && player.IsDead)
+    Debug.Log($"player.GameManager.GameUIManager.IsShopOpen(): {player.GameManager.GameUIManager.IsShopOpen()}");
+    if (player != null && player.IsDead && player.GameManager.GameUIManager.IsShopOpen())
     {
       return;
     }

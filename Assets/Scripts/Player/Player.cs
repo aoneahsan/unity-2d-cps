@@ -7,16 +7,22 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour, IDamageable
 {
   [SerializeField][Range(0, 100)] int health = 10;
+  [SerializeField] int diamonds = 0;
 
   PlayerAnimator playerAnimator;
   Rigidbody2D playerRigidbody;
   PlayerInput playerInput;
+
+  GameManager gameManager;
+  public GameManager GameManager { get { return gameManager; } }
+
 
   bool isDead = false;
   public bool IsDead { get { return isDead; } }
 
   private void Awake()
   {
+    gameManager = FindObjectOfType<GameManager>();
     playerAnimator = GetComponent<PlayerAnimator>();
     playerRigidbody = GetComponent<Rigidbody2D>();
     playerInput = GetComponent<PlayerInput>();
@@ -44,5 +50,19 @@ public class Player : MonoBehaviour, IDamageable
     }
 
     isDead = true;
+  }
+
+  public void CollectPickable(PickableType pickableType, int amount)
+  {
+    if (amount < 1) return;
+
+    switch (pickableType)
+    {
+      case PickableType.Diamond:
+        diamonds += amount;
+        break;
+    }
+
+    Debug.Log($"current diamonds: {diamonds}");
   }
 }

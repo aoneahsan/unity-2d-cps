@@ -10,3 +10,8 @@ public enum PlayerAnimations
   JumpSwingFire,
   Dead
 }
+
+public enum PickableType
+{
+  Diamond
+}
