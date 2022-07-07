@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc0ad02dd3a8f334396be41b6f395324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amount: 1
+  amount: 5
   pickableType: 0
 --- !u!95 &214624444940131116
 Animator:

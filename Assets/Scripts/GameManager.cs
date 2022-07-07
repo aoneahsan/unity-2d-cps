@@ -14,6 +14,4 @@ public class GameManager : MonoBehaviour
     gameUIManager = GetComponent<GameUIManager>();
     player = FindObjectOfType<Player>();
   }
-
-
 }

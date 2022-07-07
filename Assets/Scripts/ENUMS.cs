@@ -15,3 +15,11 @@ public enum PickableType
 {
   Diamond
 }
+
+public enum ShopItems
+{
+  FlameSward,
+  KeyToCastle,
+  BootsOfFlight,
+  None
+}

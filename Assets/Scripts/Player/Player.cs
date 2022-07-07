@@ -6,9 +6,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerMove), typeof(PlayerAnimator), typeof(Rigidbody2D))]
 public class Player : MonoBehaviour, IDamageable
 {
-  [SerializeField][Range(0, 100)] int health = 10;
   [SerializeField] int diamonds = 0;
   public int Diamonds { get { return diamonds; } }
+
   PlayerAnimator playerAnimator;
   Rigidbody2D playerRigidbody;
   PlayerInput playerInput;
@@ -16,9 +16,15 @@ public class Player : MonoBehaviour, IDamageable
   GameManager gameManager;
   public GameManager GameManager { get { return gameManager; } }
 
-
   bool isDead = false;
   public bool IsDead { get { return isDead; } }
+  bool hasFlameSward = false;
+  public bool HasFlameSward { get { return hasFlameSward; } }
+  bool hasBootsOfFlight = false;
+  public bool HasBootsOfFlight { get { return hasBootsOfFlight; } }
+  bool hasKeyToCastle = false;
+  public bool HasKeyToCastle { get { return hasKeyToCastle; } }
+  [SerializeField] int health = 0; // we will set this using gameUIManager, by getting the number of player health bars.
 
   private void Awake()
   {
@@ -28,11 +34,24 @@ public class Player : MonoBehaviour, IDamageable
     playerInput = GetComponent<PlayerInput>();
   }
 
+  private void Start()
+  {
+    if (gameManager != null)
+    {
+      health = gameManager.GameUIManager.PlayerHealthBarCount;
+    }
+    UpdatePlayerBalance();
+  }
+
   public void Damage(int damageAmount)
   {
     if (!isDead)
     {
       health -= damageAmount;
+      if (gameManager != null)
+      {
+        gameManager.GameUIManager.UpdatePlayerHealthBar(health);
+      }
       if (health <= 0)
       {
         Die();
@@ -63,6 +82,33 @@ public class Player : MonoBehaviour, IDamageable
         break;
     }
 
-    Debug.Log($"current diamonds: {diamonds}");
+    UpdatePlayerBalance();
+  }
+
+  private void UpdatePlayerBalance()
+  {
+    if (gameManager != null)
+    {
+      gameManager.GameUIManager.UpdatePlayerBalance(diamonds);
+    }
+  }
+
+  public bool BuyItem(ShopItems shopItem, int price)
+  {
+    if (diamonds < price) return false;
+    diamonds -= price;
+    switch (shopItem)
+    {
+      case ShopItems.FlameSward:
+        hasFlameSward = true;
+        break;
+      case ShopItems.BootsOfFlight:
+        hasBootsOfFlight = true;
+        break;
+      case ShopItems.KeyToCastle:
+        hasKeyToCastle = true;
+        break;
+    }
+    return true;
   }
 }
