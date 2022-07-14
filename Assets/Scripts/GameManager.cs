@@ -9,9 +9,13 @@ public class GameManager : MonoBehaviour
   Player player;
   public Player Player { get { return player; } }
 
+  AdsManager adsManager;
+  public AdsManager AdsManager { get { return adsManager; } }
+
   private void Awake()
   {
     gameUIManager = GetComponent<GameUIManager>();
     player = FindObjectOfType<Player>();
+    adsManager = FindObjectOfType<AdsManager>();
   }
 }

@@ -15,7 +15,6 @@ public class ShopKeeper : MonoBehaviour
   {
     if (other.gameObject.tag == "Player" && gameManager != null)
     {
-      Debug.Log("player entered shop");
       gameManager.GameUIManager.OpenShop();
     }
   }
@@ -24,7 +23,6 @@ public class ShopKeeper : MonoBehaviour
   {
     if (other.gameObject.tag == "Player" && gameManager != null)
     {
-      Debug.Log("player exited shop");
       gameManager.GameUIManager.CloseShop();
     }
   }

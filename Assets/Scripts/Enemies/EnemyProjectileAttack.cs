@@ -14,13 +14,10 @@ public class EnemyProjectileAttack : MonoBehaviour
 
   public void AttackProjectile()
   {
-    Debug.Log("EnemyProjectileAttack.AttackProjectile()");
     if (enemy == null || enemy.IsDead || projectilePrefab == null)
     {
       return;
     }
-
-    Debug.Log("EnemyProjectileAttack.AttackProjectile()  2");
 
     Instantiate(projectilePrefab, transform.position, Quaternion.identity);
   }

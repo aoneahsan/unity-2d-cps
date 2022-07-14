@@ -57,6 +57,11 @@ public class GameUIManager : MonoBehaviour
     {
       playerBalanceTextShopUI.text = $"{gameManager.Player.Diamonds}G";
       shopUI.SetActive(true);
+
+      if (gameManager.AdsManager != null)
+      {
+        gameManager.AdsManager.LoadAd();
+      }
     }
   }
 
@@ -148,6 +153,21 @@ public class GameUIManager : MonoBehaviour
     {
       gameOverUI.SetActive(false);
     }
+  }
+
+  public void LoadMenuScene()
+  {
+    SceneManager.LoadScene("Menu");
+  }
+
+  public void LoadGameScene()
+  {
+    SceneManager.LoadScene("Game");
+  }
+
+  public void CloseGame()
+  {
+    Application.Quit();
   }
 
   public void RestartGame()
