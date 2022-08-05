@@ -841,9 +841,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ballPrefab: {fileID: 3748766010106147167, guid: 97dcc5d460f0d0b46bc117abdc0860d7, type: 3}
-  spwanDelay: 1
-  despwanDelay: 0.3
-  ballPivotRG: {fileID: 472296088}
+  pivot: {fileID: 472296088}
+  detachDelay: 0.2
+  respawnDelay: 1
+  ballDestroyDelay: 20
 --- !u!4 &1509641912
 Transform:
   m_ObjectHideFlags: 0

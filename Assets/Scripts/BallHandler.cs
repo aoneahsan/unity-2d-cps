@@ -2,83 +2,104 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class BallHandler : MonoBehaviour
 {
-  [SerializeField] GameObject ballPrefab;
-  [SerializeField] float spwanDelay = 1;
-  [SerializeField] float despwanDelay = .3f;
-  [SerializeField] Rigidbody2D ballPivotRG;
+  [SerializeField] private GameObject ballPrefab;
+  [SerializeField] private Rigidbody2D pivot;
+  [SerializeField] private float detachDelay;
+  [SerializeField] private float respawnDelay;
+  [SerializeField] float ballDestroyDelay = 20;
 
-  Camera mainCamera;
-  Transform ballTransform;
-  Rigidbody2D ballRG;
-  SpringJoint2D ballSpringJoint;
+  private Rigidbody2D currentBallRigidbody;
+  private SpringJoint2D currentBallSprintJoint;
 
+  private Camera mainCamera;
+  private bool isDragging;
+
+  // Start is called before the first frame update
   void Start()
   {
     mainCamera = Camera.main;
-    SpwanBall();
+
+    SpawnNewBall();
   }
 
+  void OnEnable()
+  {
+    EnhancedTouchSupport.Enable();
+  }
+
+  void OnDisable()
+  {
+    EnhancedTouchSupport.Disable();
+  }
+
+  // Update is called once per frame
   void Update()
   {
-    if (Touchscreen.current.primaryTouch.press.isPressed && mainCamera != null)
+    if (currentBallRigidbody == null) { return; }
+
+    if (Touch.activeTouches.Count == 0)
     {
-      if (ballRG != null && !ballRG.isKinematic)
+      if (isDragging)
       {
-        ballRG.bodyType = RigidbodyType2D.Kinematic;
+        LaunchBall();
       }
 
-      Vector2 touchinput = Touchscreen.current.primaryTouch.position.ReadValue();
+      isDragging = false;
 
-      Vector3 pos = mainCamera.ScreenToWorldPoint(touchinput);
+      return;
+    }
 
-      if (ballTransform != null)
+    isDragging = true;
+    currentBallRigidbody.isKinematic = true;
+
+    Vector2 touchPosition = new Vector2();
+
+    foreach (Touch touch in Touch.activeTouches)
+    {
+      if (new Rect(0, 0, Screen.width, Screen.height).Contains(touch.screenPosition))
       {
-        ballTransform.position = new Vector3(pos.x, pos.y, 0f);
+        touchPosition += touch.screenPosition;
       }
     }
-    else
-    {
-      if (ballRG != null && ballRG.isKinematic)
-      {
-        ballRG.bodyType = RigidbodyType2D.Dynamic;
-      }
-    }
 
-    if (Touchscreen.current.primaryTouch.press.wasReleasedThisFrame)
-    {
-      Invoke(nameof(DespwanBall), despwanDelay);
-    }
+    touchPosition /= Touch.activeTouches.Count;
+
+    Vector3 worldPosition = mainCamera.ScreenToWorldPoint(touchPosition);
+
+    currentBallRigidbody.position = worldPosition;
   }
 
-  void DespwanBall()
+  private void SpawnNewBall()
   {
-    if (ballSpringJoint != null)
-    {
-      ballSpringJoint.enabled = false;
-    }
+    GameObject ballInstance = Instantiate(ballPrefab, pivot.position, Quaternion.identity);
 
-    Invoke(nameof(SpwanBall), spwanDelay);
+    currentBallRigidbody = ballInstance.GetComponent<Rigidbody2D>();
+    currentBallSprintJoint = ballInstance.GetComponent<SpringJoint2D>();
+
+    currentBallSprintJoint.connectedBody = pivot;
+
+    Destroy(ballInstance, ballDestroyDelay);
   }
 
-  void SpwanBall()
+  private void LaunchBall()
   {
-    if (ballPrefab != null && ballPivotRG != null)
-    {
-      ballSpringJoint = null;
-      ballRG = null;
-      ballTransform = null;
+    currentBallRigidbody.isKinematic = false;
+    currentBallRigidbody = null;
 
-      GameObject ball = Instantiate(ballPrefab, ballPivotRG.transform.position, Quaternion.identity);
-
-      ballTransform = ball.GetComponent<Transform>();
-      ballRG = ballTransform.GetComponent<Rigidbody2D>();
-      ballSpringJoint = ballTransform.GetComponent<SpringJoint2D>();
-
-      ballSpringJoint.connectedBody = ballPivotRG;
-    }
-
+    Invoke(nameof(DetachBall), detachDelay);
   }
+
+  private void DetachBall()
+  {
+    currentBallSprintJoint.enabled = false;
+    currentBallSprintJoint = null;
+
+    Invoke(nameof(SpawnNewBall), respawnDelay);
+  }
+
 }
