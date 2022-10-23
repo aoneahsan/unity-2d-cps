@@ -78,6 +78,8 @@ public class GameSession : MonoBehaviour
             myAudioSource.Play();
             playerScore += points;
             scoreText.text = playerScore.ToString();
+        } else {
+            Debug.LogWarning($"Invalid points amount passed, points: '{points}'.");
         }
     }
 }
